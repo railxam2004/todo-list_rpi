@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: #333;
+  font-size: 28px;
+}
+
+.new-task {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.new-task h2 {
+  color: #666;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.new-task input {
+  width: 70%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.new-task button {
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.new-task button:hover {
+  background-color: #45a049;
+}
+
+.desk {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.desk > div {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.desk h2 {
+  color: #666;
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+}
+
+.desk p {
+  background: #f9f9f9;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 4px;
+  border-left: 3px solid #ddd;
+}
+
+.trash button {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.trash button:hover {
+  background-color: #cc0000;
+}
+
+/* Специфичные цвета для разных колонок */
+.backlog p {
+  border-left-color: #ff6b6b;
+}
+
+.in-process p {
+  border-left-color: #4ecdc4;
+}
+
+.done p {
+  border-left-color: #1dd1a1;
+}
+
+.trash p {
+  border-left-color: #8395a7;
+}
