@@ -1,51 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khamidullin R.R.</title>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="../normalize.css">
-</head>
-<body>
-    <header>
-      <h1>Список задач</h1>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khamidullin R.R.</title>
+    <link rel="stylesheet" href="static/styles/style.css" />
+    <link rel="stylesheet" href="static/styles/normalize.css" />
+  </head>
+  <body>
+    <!-- Сюда будет рендериться HeaderComponent через JS -->
+    <header class="app"></header>
+
     <main>
-      <div class="new-task">
-        <h2>Новая задача</h2>
-        <input type="text" placeholder="Название задачи...">
-        <button>+Добавить</button>
-      </div>
-      
-      <div class="desk">
-        <div class="backlog">
-          <h2>Бэклог</h2>
-          <p>Выучить JS</p>
-          <p>Выучить React</p>
-          <p>Сделать домашку</p>
-        </div>
+      <!-- Сюда будет рендериться форма добавления задач -->
+      <section class="add-task-form"></section>
 
-        <div class="in-process">
-          <h2>В процессе</h2>
-          <p>Выпить смузи</p>
-          <p>Попить воды</p>
-        </div>
-
-        <div class="done">
-          <h2>Готово</h2>
-          <p>Позвонить маме</p>
-          <p>Погладить кота</p>
-        </div>
-
-        <div class="trash">
-          <h2>Корзина</h2>
-          <p>Сходить погулять</p>
-          <p>Прочитать Войну и Мир</p>
-          <button>х Очистить</button>
-        </div>
-      </div>
-
+      <!-- Сюда будет рендериться доска с задачами -->
+      <section class="task-board"></section>
     </main>
-</body>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
 </html>

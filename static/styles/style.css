@@ -25,7 +25,7 @@ header h1 {
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .new-task h2 {
@@ -44,7 +44,7 @@ header h1 {
 
 .new-task button {
   padding: 10px 15px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 4px;
@@ -61,13 +61,14 @@ header h1 {
   flex-wrap: wrap;
 }
 
-.desk > div {
+/* Изменено: .desk > div на .desk > section */
+.desk > section {
   background: white;
   padding: 20px;
   border-radius: 8px;
   flex: 1;
   min-width: 200px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .desk h2 {
@@ -78,12 +79,14 @@ header h1 {
   border-bottom: 2px solid #eee;
 }
 
-.desk p {
+/* Изменено: .desk p на .desk li */
+.desk li {
   background: #f9f9f9;
   padding: 10px;
   margin: 8px 0;
   border-radius: 4px;
   border-left: 3px solid #ddd;
+  list-style-type: none; /* Убираем маркеры списка */
 }
 
 .trash button {
@@ -101,18 +104,22 @@ header h1 {
 }
 
 /* Специфичные цвета для разных колонок */
-.backlog p {
+/* Изменено: .backlog p на .backlog li */
+.backlog li {
   border-left-color: #ff6b6b;
 }
 
-.in-process p {
+/* Изменено: .in-process p на .in-process li */
+.in-process li {
   border-left-color: #4ecdc4;
 }
 
-.done p {
+/* Изменено: .done p на .done li */
+.done li {
   border-left-color: #1dd1a1;
 }
 
-.trash p {
+/* Изменено: .trash p на .trash li */
+.trash li {
   border-left-color: #8395a7;
 }
