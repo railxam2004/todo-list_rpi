@@ -1,7 +1,15 @@
+// src/view/task-component.js
 import { createElement } from "../framework/render.js";
 
 function createTaskComponentTemplate(task) {
-  return `<li class="task-item">${task}</li>`;
+  const { title, status } = task;
+  return `
+    <li class="task-item task--${status}">
+      <div class="task-body">
+        <p class="task-title">${title}</p>
+      </div>
+    </li>
+  `;
 }
 
 export default class TaskComponent {

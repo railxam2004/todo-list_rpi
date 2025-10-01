@@ -61,8 +61,7 @@ header h1 {
   flex-wrap: wrap;
 }
 
-/* Изменено: .desk > div на .desk > section */
-.desk > section {
+.desk > div {
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -79,17 +78,39 @@ header h1 {
   border-bottom: 2px solid #eee;
 }
 
-/* Изменено: .desk p на .desk li */
 .desk li {
   background: #f9f9f9;
   padding: 10px;
   margin: 8px 0;
   border-radius: 4px;
   border-left: 3px solid #ddd;
-  list-style-type: none; /* Убираем маркеры списка */
+  list-style-type: none;
 }
 
-.trash button {
+/* Стили для каждой колонки по порядку */
+
+/* Колонка 1 — Бэклог */
+.desk > div:nth-child(1) li {
+  border-left-color: #ff6b6b;
+}
+
+/* Колонка 2 — В процессе */
+.desk > div:nth-child(2) li {
+  border-left-color: #4ecdc4;
+}
+
+/* Колонка 3 — Готово */
+.desk > div:nth-child(3) li {
+  border-left-color: #1dd1a1;
+}
+
+/* Колонка 4 — Корзина */
+.desk > div:nth-child(4) li {
+  border-left-color: #8395a7;
+}
+
+/* Кнопка очистки корзины */
+.desk > div:nth-child(4) button {
   margin-top: 15px;
   padding: 8px 15px;
   background-color: #ff4444;
@@ -99,27 +120,6 @@ header h1 {
   cursor: pointer;
 }
 
-.trash button:hover {
+.desk > div:nth-child(4) button:hover {
   background-color: #cc0000;
-}
-
-/* Специфичные цвета для разных колонок */
-/* Изменено: .backlog p на .backlog li */
-.backlog li {
-  border-left-color: #ff6b6b;
-}
-
-/* Изменено: .in-process p на .in-process li */
-.in-process li {
-  border-left-color: #4ecdc4;
-}
-
-/* Изменено: .done p на .done li */
-.done li {
-  border-left-color: #1dd1a1;
-}
-
-/* Изменено: .trash p на .trash li */
-.trash li {
-  border-left-color: #8395a7;
 }
