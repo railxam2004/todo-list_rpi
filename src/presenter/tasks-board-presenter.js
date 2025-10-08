@@ -2,6 +2,7 @@ import TaskListComponent from "../view/task-list-component.js";
 import TaskComponent from "../view/task-component.js";
 import TaskBoardComponent from "../view/task-board-component.js";
 import ClearBasketButtonComponent from "../view/clear-basket-button-component.js";
+import EmptyTaskListComponent from "../view/empty-task-list-component.js";
 import { render } from "../framework/render.js";
 import { Status, StatusLabel } from "../const.js";
 
@@ -33,6 +34,7 @@ export default class TasksBoardPresenter {
         status,
         label: StatusLabel[status],
       });
+
       render(tasksListComponent, this.#tasksBoardComponent.element);
       this.#renderTasksList(tasksListComponent, status);
     });
@@ -42,7 +44,7 @@ export default class TasksBoardPresenter {
     const tasksForStatus = getTasksByStatus(this.#boardTasks, status);
 
     if (tasksForStatus.length === 0) {
-      this.#renderEmptyState(tasksListComponent.element);
+      this.#renderEmptyState(tasksListComponent.tasksContainer);
       return;
     }
 
@@ -66,9 +68,7 @@ export default class TasksBoardPresenter {
   }
 
   #renderEmptyState(container) {
-    const empty = document.createElement("p");
-    empty.classList.add("empty");
-    empty.textContent = "Нет задач";
-    container.append(empty);
+    const emptyComponent = new EmptyTaskListComponent();
+    render(emptyComponent, container);
   }
 }
