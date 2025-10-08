@@ -5,6 +5,10 @@ import ClearBasketButtonComponent from "../view/clear-basket-button-component.js
 import { render } from "../framework/render.js";
 import { Status, StatusLabel } from "../const.js";
 
+function getTasksByStatus(tasks, status) {
+  return tasks.filter((task) => task.status === status);
+}
+
 export default class TasksBoardPresenter {
   #boardContainer = null;
   #tasksModel = null;
@@ -17,34 +21,54 @@ export default class TasksBoardPresenter {
   }
 
   init() {
-    this.#boardTasks = [...this.#tasksModel.getTasks()];
+    this.#boardTasks = [...this.#tasksModel.tasks];
+    this.#renderBoard();
+  }
+
+  #renderBoard() {
     render(this.#tasksBoardComponent, this.#boardContainer);
 
-    const statuses = [
-      Status.BACKLOG,
-      Status.PROCESSING,
-      Status.DONE,
-      Status.BASKET,
-    ];
-
-    statuses.forEach((status) => {
-      const tasksListComponent = new TaskListComponent(StatusLabel[status]);
-      render(tasksListComponent, this.#tasksBoardComponent.getElement());
-
-      const taskContainer = tasksListComponent.getTasksContainer();
-
-      this.#boardTasks
-        .filter((task) => task.status === status)
-        .forEach((task) => {
-          const taskComponent = new TaskComponent(task);
-          render(taskComponent, taskContainer);
-        });
-
-      // 🔹 Добавляем кнопку в корзину
-      if (status === Status.BASKET) {
-        const clearButton = new ClearBasketButtonComponent();
-        render(clearButton, tasksListComponent.getElement());
-      }
+    Object.values(Status).forEach((status) => {
+      const tasksListComponent = new TaskListComponent({
+        status,
+        label: StatusLabel[status],
+      });
+      render(tasksListComponent, this.#tasksBoardComponent.element);
+      this.#renderTasksList(tasksListComponent, status);
     });
+  }
+
+  #renderTasksList(tasksListComponent, status) {
+    const tasksForStatus = getTasksByStatus(this.#boardTasks, status);
+
+    if (tasksForStatus.length === 0) {
+      this.#renderEmptyState(tasksListComponent.element);
+      return;
+    }
+
+    tasksForStatus.forEach((task) => {
+      this.#renderTask(task, tasksListComponent.tasksContainer);
+    });
+
+    if (status === Status.BASKET) {
+      this.#renderClearButton(tasksListComponent.element);
+    }
+  }
+
+  #renderTask(task, container) {
+    const taskComponent = new TaskComponent({ task });
+    render(taskComponent, container);
+  }
+
+  #renderClearButton(container) {
+    const clearButton = new ClearBasketButtonComponent();
+    render(clearButton, container);
+  }
+
+  #renderEmptyState(container) {
+    const empty = document.createElement("p");
+    empty.classList.add("empty");
+    empty.textContent = "Нет задач";
+    container.append(empty);
   }
 }

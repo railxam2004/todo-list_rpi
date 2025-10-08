@@ -1,6 +1,6 @@
-import { createElement } from "../framework/render.js";
+import { AbstractComponent } from "../framework/view/abstract-component.js";
 
-function createTaskListComponentTemplate(label) {
+function createTaskListTemplate(label) {
   return `
     <div class="task-list">
       <h2>${label}</h2>
@@ -9,28 +9,19 @@ function createTaskListComponentTemplate(label) {
   `;
 }
 
-export default class TaskListComponent {
-  constructor(label) {
-    this.label = label;
+export default class TaskListComponent extends AbstractComponent {
+  #label = null;
+
+  constructor({ status, label }) {
+    super();
+    this.#label = label;
   }
 
-  getTemplate() {
-    return createTaskListComponentTemplate(this.label);
+  get template() {
+    return createTaskListTemplate(this.#label);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  // получаем ul для рендера задач
-  getTasksContainer() {
-    return this.getElement().querySelector(".task-container");
-  }
-
-  removeElement() {
-    this.element = null;
+  get tasksContainer() {
+    return this.element.querySelector(".task-container");
   }
 }
