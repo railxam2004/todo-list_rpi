@@ -36,10 +36,57 @@ export default class TasksModel {
   }
 
   /**
+   * Обновляет статус задачи
+   * @param {string} taskId
+   * @param {string} newStatus
+   */
+  updateTaskStatus(taskId, newStatus) {
+    const task = this.#boardtasks.find((t) => t.id === taskId);
+    if (task) {
+      task.status = newStatus;
+      this.#notify();
+    }
+  }
+
+  /**
+   * Перемещает задачу в указанный список и вставляет ПЕРЕД beforeTaskId (или в конец, если beforeTaskId = null)
+   * Простой способ: манипулируем единым массивом, используя индексы элементов.
+   */
+  moveTask(taskId, newStatus, beforeTaskId = null) {
+    const arr = this.#boardtasks;
+    const fromIndex = arr.findIndex((t) => t.id === taskId);
+    if (fromIndex === -1) return;
+
+    const [task] = arr.splice(fromIndex, 1);
+    task.status = newStatus;
+
+    let insertIndex;
+    if (beforeTaskId) {
+      insertIndex = arr.findIndex((t) => t.id === beforeTaskId);
+      if (insertIndex === -1) {
+        // если не нашли целевую задачу — добавляем в конец нужной колонки
+        insertIndex = this.#lastIndexOfStatus(newStatus) + 1;
+      }
+    } else {
+      // добавить в конец колонки newStatus
+      insertIndex = this.#lastIndexOfStatus(newStatus) + 1;
+    }
+
+    // Гарантия валидного диапазона
+    if (insertIndex < 0) insertIndex = 0;
+    if (insertIndex > arr.length) insertIndex = arr.length;
+
+    arr.splice(insertIndex, 0, task);
+    this.#notify();
+  }
+
+  /**
    * Очищает корзину (удаляет задачи со статусом basket)
    */
   clearBasket() {
-    this.#boardtasks = this.#boardtasks.filter((t) => t.status !== Status.BASKET);
+    this.#boardtasks = this.#boardtasks.filter(
+      (t) => t.status !== Status.BASKET
+    );
     this.#notify();
   }
 
@@ -54,5 +101,16 @@ export default class TasksModel {
 
   #notify() {
     this.#observers.forEach((observer) => observer());
+  }
+
+  /**
+   * Возвращает последний индекс задачи с данным статусом (или -1, если таких нет)
+   */
+  #lastIndexOfStatus(status) {
+    let last = -1;
+    for (let i = 0; i < this.#boardtasks.length; i++) {
+      if (this.#boardtasks[i].status === status) last = i;
+    }
+    return last;
   }
 }

@@ -57,6 +57,7 @@ export default class TasksBoardPresenter {
       const listComponent = new TaskListComponent({
         status,
         label: StatusLabel[status],
+        onTaskDrop: this.#handleTaskDrop.bind(this)
       });
 
       render(listComponent, this.#tasksBoardComponent.element);
@@ -110,5 +111,9 @@ export default class TasksBoardPresenter {
   #handleModelChange() {
     this.#clearBoard();
     this.#renderBoard();
+  }
+
+  #handleTaskDrop(taskId, newStatus, beforeTaskId) {
+  this.#tasksModel.moveTask(taskId, newStatus, beforeTaskId);
   }
 }
