@@ -27,7 +27,7 @@ export default class TaskListComponent extends AbstractComponent {
     });
     container.addEventListener('drop', (event) => {
       event.preventDefault();
-      const taskId = event.dataTransfer.getData('text/plain');
+      const taskId = event.dataTransfer.getData('application/x-task-id');
       const li = event.target.closest('.task-item');
       const beforeTaskId = li ? li.getAttribute('data-id') : null;
       onTaskDrop(taskId, this.#status, beforeTaskId);
