@@ -1,57 +1,95 @@
-import { tasks } from "../mock/task.js";
-import { Status } from "../const.js";
+import Observable from '../framework/observable.js';
+// ВАЖНО: Добавляем UserAction, который нужен для notify в addTask
+import { Status, UpdateType, UserAction } from "../const.js"; 
 import { generateID } from "../utils.js";
 
-export default class TasksModel {
-  #boardtasks = tasks;
-  #observers = [];
+
+export default class TasksModel extends Observable {
+  #tasksApiService = null;
+  #boardtasks = [];
+
+  constructor({ tasksApiService }) {
+    super();
+    this.#tasksApiService = tasksApiService;
+  }
+
+  /**
+   * Инициализирует модель, загружая задачи с сервера.
+   */
+  async init() {
+    try {
+      // Предполагаем, что #tasksApiService.tasks - это геттер, возвращающий Promise
+      const tasks = await this.#tasksApiService.tasks;
+      this.#boardtasks = tasks;
+    } catch (err) {
+      this.#boardtasks = [];
+      console.error("Ошибка при загрузке задач:", err); 
+    }
+    // Вызов notify о завершении инициализации
+    this._notify(UpdateType.INIT); 
+  }
+
+
+  // --- Методы работы с задачами ---
 
   get tasks() {
     return this.#boardtasks;
   }
 
-  /**
-   * Возвращает задачи по статусу
-   * @param {string} status
-   * @returns {Array}
-   */
   getTasksByStatus(status) {
     return this.#boardtasks.filter((task) => task.status === status);
   }
 
   /**
-   * Добавляет новую задачу в бэклог
+   * Асинхронно добавляет новую задачу, отправляя её на сервер
    * @param {string} title
    * @returns {object} созданная задача
    */
-  addTask(title) {
+  async addTask(title) { // <- МЕТОД СДЕЛАН АСИНХРОННЫМ
     const newTask = {
-      id: generateID(),
       title,
-      status: Status.BACKLOG,
+      status: Status.BACKLOG, // Используем вашу константу
     };
-    this.#boardtasks.push(newTask);
-    this.#notify();
-    return newTask;
-  }
 
-  /**
-   * Обновляет статус задачи
-   * @param {string} taskId
-   * @param {string} newStatus
-   */
-  updateTaskStatus(taskId, newStatus) {
-    const task = this.#boardtasks.find((t) => t.id === taskId);
-    if (task) {
-      task.status = newStatus;
-      this.#notify();
+    try {
+      // Отправляем задачу на сервер
+      const createdTask = await this.#tasksApiService.addTask(newTask); 
+      
+      // Обновляем локальные данные, добавляя ответ сервера (включая id)
+      this.#boardtasks.push(createdTask); 
+      
+      // Уведомляем об успешном добавлении
+      this._notify(UserAction.ADD_TASK, UpdateType.MINOR, createdTask);
+      
+      return createdTask;
+    } catch (err) {
+      console.error('Ошибка при добавлении задачи на сервер:', err);
+      // Если не смогли добавить, не меняем локальное состояние и перебрасываем ошибку
+      throw err;
     }
   }
 
-  /**
-   * Перемещает задачу в указанный список и вставляет ПЕРЕД beforeTaskId (или в конец, если beforeTaskId = null)
-   * Простой способ: манипулируем единым массивом, используя индексы элементов.
-   */
+
+async updateTaskStatus(taskId, newStatus) {
+  const task = this.#boardtasks.find(task => task.id === taskId);
+  if (!task) return;
+
+  const previousStatus = task.status;
+  task.status = newStatus;
+
+  try {
+    const updatedTask = await this.#tasksApiService.updateTask(task);
+    Object.assign(task, updatedTask);
+    this._notify(UserAction.UPDATE_TASK, task);
+  } catch (err) {
+    console.error('Ошибка при обновлении статуса задачи на сервер:', err);
+    task.status = previousStatus; // откат, если ошибка
+    throw err;
+  }
+}
+
+  
+  // ... Остальные методы (moveTask, clearBasket, #lastIndexOfStatus) без изменений
   moveTask(taskId, newStatus, beforeTaskId = null) {
     const arr = this.#boardtasks;
     const fromIndex = arr.findIndex((t) => t.id === taskId);
@@ -64,48 +102,26 @@ export default class TasksModel {
     if (beforeTaskId) {
       insertIndex = arr.findIndex((t) => t.id === beforeTaskId);
       if (insertIndex === -1) {
-        // если не нашли целевую задачу — добавляем в конец нужной колонки
         insertIndex = this.#lastIndexOfStatus(newStatus) + 1;
       }
     } else {
-      // добавить в конец колонки newStatus
       insertIndex = this.#lastIndexOfStatus(newStatus) + 1;
     }
 
-    // Гарантия валидного диапазона
     if (insertIndex < 0) insertIndex = 0;
     if (insertIndex > arr.length) insertIndex = arr.length;
 
     arr.splice(insertIndex, 0, task);
-    this.#notify();
+    this._notify(UpdateType.MINOR);
   }
 
-  /**
-   * Очищает корзину (удаляет задачи со статусом basket)
-   */
   clearBasket() {
     this.#boardtasks = this.#boardtasks.filter(
       (t) => t.status !== Status.BASKET
     );
-    this.#notify();
+    this._notify(UpdateType.MAJOR); 
   }
 
-  // --- Observer API ---
-  addObserver(observer) {
-    this.#observers.push(observer);
-  }
-
-  removeObserver(observer) {
-    this.#observers = this.#observers.filter((obs) => obs !== observer);
-  }
-
-  #notify() {
-    this.#observers.forEach((observer) => observer());
-  }
-
-  /**
-   * Возвращает последний индекс задачи с данным статусом (или -1, если таких нет)
-   */
   #lastIndexOfStatus(status) {
     let last = -1;
     for (let i = 0; i < this.#boardtasks.length; i++) {
@@ -113,4 +129,22 @@ export default class TasksModel {
     }
     return last;
   }
+
+  async clearBasketTasks() {
+  const basketTasks = this.#boardtasks.filter(task => task.status === 'basket');
+
+  try {
+    await Promise.all(basketTasks.map(task => this.#tasksApiService.deleteTask(task.id)));
+    this.#boardtasks = this.#boardtasks.filter(task => task.status !== 'basket');
+    this._notify(UserAction.DELETE_TASK, { status: 'basket' });
+  } catch (err) {
+    console.error('Ошибка при удалении задач из корзины на сервере:', err);
+    throw err;
+  }
+}
+
+hasBasketTasks() {
+  return this.#boardtasks.some(task => task.status === 'basket');
+}
+
 }
